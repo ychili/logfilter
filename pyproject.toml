@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.9"
+
+[tool.pylint.basic]
+docstring-min-length = 4
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.string]
+check-quote-consistency = true
+check-str-concat-over-line-jumps = true

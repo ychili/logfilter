@@ -1,0 +1,18 @@
+LogFilter
+
+Print lines from log files which match the given date range and severity
+level.
+
+Use GNU date to convert dates into datestamps, then use AWK to filter
+lines by field -- an overgrown version of this one-liner:
+
+    awk \
+      -v after=$(date --date=today-3days +%Y-%m-%d) \
+      -v before=$(date --date=today+1day +%Y-%m-%d) \
+      -v level='CRITICAL|ERROR|WARNING|INFO' \
+      '$1 > after && $1 <= before && $3 ~ level' \
+      ${logfiles}
+
+Run-time requirements: Python 3.9+, GNU date, AWK
+
+Copyright 2023 Dylan Maltby
