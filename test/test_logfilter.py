@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-
+#
+#  Copyright 2023 Dylan Maltby
+#  SPDX-Licence-Identifier: Apache-2.0
+#
 import unittest
 
 import logfilter
