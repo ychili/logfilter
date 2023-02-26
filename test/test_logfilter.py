@@ -21,6 +21,10 @@ class TestKVParse(unittest.TestCase):
     spacing = ["  NormalKey = No line breaks please\n", "  Key With Spaces = Value\n"]
     punctuation = ["EqualsSign = 2 + 2 = 4\n", "\n"]
     empty = ["  \n", "  KeyWithNoValue = \n", "   = Value with no key\n", "   =\n"]
+    ignore = [
+        "    # Comments = good \n",
+        "Any line without an equals sign will also be ignored.\n",
+    ]
 
     @staticmethod
     def func(strings):
@@ -49,6 +53,10 @@ class TestKVParse(unittest.TestCase):
     def test_empty_components(self):
         results = self.func(self.empty)
         self.assertEqual(results, {"keywithnovalue": "", "": ""})
+
+    def test_ignored_lines(self):
+        results = self.func(self.ignore)
+        self.assertEqual(results, {})
 
 
 class TestDateStr(unittest.TestCase):
