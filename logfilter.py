@@ -165,7 +165,7 @@ def awk(files: Iterable[Arg], program_text: Arg, **variables: Any) -> None:
         cmds += ["-v", f"{var}={value}"]
     cmds += ["--", program_text, *files]
     logging.debug(cmds)
-    subprocess.run(cmds, check=True, stdin=sys.stdin)
+    subprocess.run(cmds, check=True)
 
 
 def load_config_paths(*resource: Union[str, os.PathLike[str]]) -> Iterator[str]:
