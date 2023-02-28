@@ -150,6 +150,8 @@ def main() -> None:
     for file in logfiles:
         print()
         print("==>", file, "<==")
+        # Flush headers before awk starts writing
+        sys.stdout.flush()
         awk_func(files=[file])
 
 
