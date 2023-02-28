@@ -231,7 +231,7 @@ def datestr(date: str, datefmt: str) -> str:
 
 
 def die(message: str):
-    print(message, file=sys.stderr)
+    print(f"{__prog__}: {message}", file=sys.stderr)
     sys.exit(1)
 
 
