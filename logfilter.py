@@ -13,7 +13,6 @@ Depends on:
 from __future__ import annotations
 
 import argparse
-import functools
 import glob
 import logging
 import os
