@@ -22,7 +22,7 @@ import shutil
 import subprocess
 import sys
 from collections.abc import Iterable, Iterator, Mapping
-from typing import Any, Callable, Union
+from typing import Any, Callable, Optional, Union
 
 __prog__ = "logfilter"
 __version__ = "0.1.0"
@@ -141,33 +141,45 @@ def main() -> None:
     level = "|".join(LOG_LEVELS[: LOG_LEVELS.index(args.level) + 1])
     start = datestr(args.after, defaults["datefmt"])
     end = datestr(args.before, defaults["datefmt"])
-    awk_func = functools.partial(
-        awk, program_text=defaults["program"], level=level, after=start, before=end
-    )
+    awk_variables = {"level": level, "after": start, "before": end}
+    if progfile := defaults.get("progfile"):
+        awk_options = {"progfiles": progfile}
+    else:
+        awk_options = {"program_text": defaults["program"]}
     if args.batch:
-        awk_func(files=logfiles)
+        awk(files=logfiles, **awk_options, variables=awk_variables)
         return
     for file in logfiles:
         print()
         print("==>", file, "<==")
         # Flush headers before awk starts writing
         sys.stdout.flush()
-        awk_func(files=[file])
+        awk(files=[file], **awk_options, variables=awk_variables)
 
 
-def awk(files: Iterable[Arg], program_text: Arg, **variables: Any) -> None:
-    """Call `awk` with the given arguments.
-
-    ::
-        awk [-v variables...] program_text [files...]
-    """
+def awk(
+    files: Iterable[Arg],
+    program_text: Optional[Arg] = None,
+    progfiles: Optional[Iterable[Arg]] = None,
+    variables: Optional[Mapping[Any, Any]] = None,
+    field_sep: Optional[Arg] = None,
+) -> int:
     executable = shutil.which("awk") or die("awk: command not found")
     cmds = [executable]
-    for var, value in variables.items():
-        cmds += ["-v", f"{var}={value}"]
-    cmds += ["--", program_text, *files]
+    if variables is not None:
+        for var, value in variables.items():
+            cmds += ["-v", f"{var}={value}"]
+    if field_sep is not None:
+        cmds += ["-F", field_sep]
+    if program_text is not None:
+        cmds += ["--", program_text, *files]
+    elif progfiles is not None:
+        for program_file in progfiles:
+            cmds += ["-f", program_file]
+        cmds += ["--", *files]
     logging.debug(cmds)
-    subprocess.run(cmds, check=True)
+    proc = subprocess.run(cmds, check=True)
+    return proc.returncode
 
 
 def load_config_paths(*resource: Union[str, os.PathLike[str]]) -> Iterator[str]:
