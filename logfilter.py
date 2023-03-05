@@ -164,6 +164,12 @@ def awk(
     variables: Optional[Mapping[Any, Any]] = None,
     field_sep: Optional[Arg] = None,
 ) -> int:
+    """Call `awk` with the given arguments, returning its exit status.
+
+    ::
+        awk [-v variables...] [-F field_sep] [-f progfiles... | program_text]
+            [files...]
+    """
     executable = shutil.which("awk") or die("awk: command not found")
     cmds = [executable]
     if variables is not None:
