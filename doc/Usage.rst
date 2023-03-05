@@ -39,6 +39,8 @@ logfiles : path names
     command line)
 program : string
     Program text used by AWK
+progfile : path name
+    Name of file containing AWK program to use instead of *program*
 
 Built-in defaults:
 
