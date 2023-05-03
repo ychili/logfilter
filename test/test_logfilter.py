@@ -9,7 +9,6 @@ import logfilter
 
 
 class TestKVParse(unittest.TestCase):
-
     basic = r"""
     # Each line in this string is indented, but that shouldn't matter.
     key1="${HOME}"/logs
@@ -60,7 +59,6 @@ class TestKVParse(unittest.TestCase):
 
 
 class TestDateStr(unittest.TestCase):
-
     default_datefmt = logfilter.DEFAULTS["datefmt"]
 
     def test_availability(self):
