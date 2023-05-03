@@ -214,7 +214,7 @@ def load_defaults(defaults: dict[str, str]) -> dict[str, str]:
     config_files = reversed(list(load_config_paths(__prog__, CONFIG_PATH)))
     for cfg in config_files:
         try:
-            file = open(cfg)
+            file = open(cfg, encoding="utf-8")
         except OSError:
             logging.debug("found config file but couldn't open for reading: %s", cfg)
             continue
