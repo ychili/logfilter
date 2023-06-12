@@ -169,8 +169,10 @@ def awk(
         awk [-v variables...] [-F field_sep] [-f progfiles... | program_text]
             [files...]
     """
-    executable = shutil.which("awk") or die("awk: command not found")
-    cmds = [executable]
+    executable = shutil.which("awk") or ""
+    if not executable:
+        die("awk: command not found")
+    cmds: list[Arg] = [executable]
     if variables is not None:
         for var, value in variables.items():
             cmds += ["-v", f"{var}={value}"]
@@ -243,13 +245,15 @@ def datestr(date: str, datefmt: str) -> str:
     ::
         $(date --date ${date} ${datefmt})
     """
-    executable = shutil.which("date") or die("date: command not found")
+    executable = shutil.which("date") or ""
+    if not executable:
+        die("date: command not found")
     cmds = [executable, "--date", date, datefmt]
     proc = subprocess.run(cmds, check=True, stdout=subprocess.PIPE)
     return proc.stdout.decode().strip()
 
 
-def die(message: str):
+def die(message: str) -> None:
     print(f"{__prog__}: {message}", file=sys.stderr)
     sys.exit(1)
 
