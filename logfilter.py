@@ -21,7 +21,7 @@ import shutil
 import subprocess
 import sys
 from collections.abc import Iterable, Iterator, Mapping
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
 __version__ = "0.1.0"
@@ -169,9 +169,7 @@ def awk(
         awk [-v variables...] [-F field_sep] [-f progfiles... | program_text]
             [files...]
     """
-    executable = shutil.which("awk") or ""
-    if not executable:
-        die("awk: command not found")
+    executable = shutil.which("awk") or die("awk: command not found")
     cmds: list[Arg] = [executable]
     if variables is not None:
         for var, value in variables.items():
@@ -245,15 +243,13 @@ def datestr(date: str, datefmt: str) -> str:
     ::
         $(date --date ${date} ${datefmt})
     """
-    executable = shutil.which("date") or ""
-    if not executable:
-        die("date: command not found")
+    executable = shutil.which("date") or die("date: command not found")
     cmds = [executable, "--date", date, datefmt]
     proc = subprocess.run(cmds, check=True, stdout=subprocess.PIPE)
     return proc.stdout.decode().strip()
 
 
-def die(message: str) -> None:
+def die(message: str) -> NoReturn:
     print(f"{__prog__}: {message}", file=sys.stderr)
     sys.exit(1)
 
