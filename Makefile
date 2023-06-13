@@ -24,8 +24,16 @@ $(includedir):
 clean:
 	rm -rf $(includedir)
 
+lint: pylint mypy
+
+pylint:
+	pylint logfilter.py
+
+mypy:
+	mypy --strict logfilter.py
+
 test:
 	$(PYTHON) -m doctest logfilter.py
 	$(PYTHON) test/test_logfilter.py
 
-.PHONY: clean test
+.PHONY: clean pylint mypy test
