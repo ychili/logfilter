@@ -13,6 +13,7 @@ Depends on:
 from __future__ import annotations
 
 import argparse
+import collections
 import glob
 import logging
 import os
@@ -20,7 +21,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping, MutableMapping
 from typing import Any, Callable, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
@@ -213,19 +214,19 @@ def load_config_paths(*resource: Union[str, os.PathLike[str]]) -> Iterator[str]:
             yield path
 
 
-def load_defaults(defaults: dict[str, str]) -> dict[str, str]:
+def load_defaults(defaults: MutableMapping[str, str]) -> collections.ChainMap[str, str]:
     """Merge *defaults* with k:v loaded from configuration files."""
-    config_files = reversed(list(load_config_paths(__prog__, CONFIG_PATH)))
-    for cfg in config_files:
+    maps = []
+    for cfg in load_config_paths(__prog__, CONFIG_PATH):
         try:
             file = open(cfg, encoding="utf-8")
         except OSError:
             logging.debug("found config file but couldn't open for reading: %s", cfg)
             continue
         with file:
-            defaults.update(parse_kv_config(file))
+            maps.append(parse_kv_config(file))
             logging.debug("read configuration from file: %s", cfg)
-    return defaults
+    return collections.ChainMap(*maps, defaults)
 
 
 def parse_kv_config(reader: Iterable[str]) -> dict[str, str]:
