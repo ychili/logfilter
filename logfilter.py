@@ -72,6 +72,9 @@ def disambiguate(
 
 
 def expand_paths(paths: str) -> Iterator[str]:
+    """
+    Split *paths* like a shell, and expand environment variables and globs.
+    """
     for word in shlex.split(paths):
         word = os.path.expanduser(word)
         word = os.path.expandvars(word)
@@ -128,6 +131,7 @@ def build_cla_parser(defaults: Mapping[str, str]) -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    """Parsing arguments from sys.argv, print results to sys.stdout."""
     if "LF_DEBUG" in os.environ:
         logging.basicConfig(level=logging.DEBUG)
     defaults = load_defaults(DEFAULTS)
@@ -225,6 +229,14 @@ def load_defaults(defaults: dict[str, str]) -> dict[str, str]:
 
 
 def parse_kv_config(reader: Iterable[str]) -> dict[str, str]:
+    """Return a dict of keys to values parsed from lines of text in *reader*.
+
+    Simple syntax:
+      - Keys separated from values by '='
+      - Comments starting with '#'
+      - Each line either a key–value pair or a comment
+      - External whitespace ignored
+    """
     symbols = {}
     for line in reader:
         line = line.lstrip()
