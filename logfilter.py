@@ -136,10 +136,11 @@ def main() -> None:
     if "LF_DEBUG" in os.environ:
         logging.basicConfig(level=logging.DEBUG)
     general_defaults = load_defaults(DEFAULTS)
-    cfg = configparser.ConfigParser(
-        defaults=general_defaults, interpolation=configparser.ExtendedInterpolation()
-    )
-    read_configuration(cfg, LOGFILES_CONF_PATH)
+    cfg = configparser.ConfigParser(defaults=general_defaults)
+    try:
+        read_configuration(cfg, LOGFILES_CONF_PATH)
+    except configparser.Error as err:
+        die(f"Error with configuration file: {err}")
     cfg_defaults = cfg.defaults()
     args = build_cla_parser(cfg_defaults).parse_args()
     logging.debug(args)
@@ -150,25 +151,40 @@ def main() -> None:
 
     for logfile in logfiles:
         section = match_section(logfile, cfg) or cfg_defaults
-        level = args.level or section["level"]
         try:
-            level_regex = "|".join(LOG_LEVELS[: LOG_LEVELS.index(level) + 1])
-        except ValueError:
-            section_name = getattr(section, "name", "DEFAULT")
-            die(f"In section [{section_name}]: invalid level name: {level}")
-        start = datestr(args.after or section["after"], section["datefmt"])
-        end = datestr(args.before or section["before"], section["datefmt"])
-        awk_variables = {"level": level_regex, "after": start, "before": end}
-        if progfile := section.get("progfile"):
-            awk_options = {"progfiles": progfile}
-        else:
-            awk_options = {"program_text": section["program"]}
+            awk_variables = _set_awk_variables(args, section)
+            awk_options = _set_awk_options(section)
+        except configparser.Error as err:
+            die(f"Error with configuration file: {err}")
         if not args.batch:
             print()
             print("==>", logfile, "<==")
             # Flush headers before awk starts writing
             sys.stdout.flush()
         awk(files=[logfile], **awk_options, variables=awk_variables)
+
+
+def _set_awk_variables(
+    args: argparse.Namespace, section: Mapping[str, str]
+) -> dict[str, str]:
+    awk_variables = {}
+    level = args.level or section["level"]
+    try:
+        awk_variables["level"] = "|".join(LOG_LEVELS[: LOG_LEVELS.index(level) + 1])
+    except ValueError:
+        section_name = getattr(section, "name", "DEFAULT")
+        die(f"In section [{section_name}]: invalid level name: {level}")
+    awk_variables["after"] = datestr(args.after or section["after"], section["datefmt"])
+    awk_variables["before"] = datestr(
+        args.before or section["before"], section["datefmt"]
+    )
+    return awk_variables
+
+
+def _set_awk_options(section: Mapping[str, str]) -> dict[str, str]:
+    if progfile := section.get("progfile"):
+        return {"progfiles": progfile}
+    return {"program_text": section["program"]}
 
 
 def awk(
