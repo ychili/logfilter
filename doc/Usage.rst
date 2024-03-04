@@ -1,11 +1,11 @@
 Usage
------
+=====
 
 .. include:: include/help.txt
    :literal:
 
 Configuration
--------------
+=============
 
 Create a config file to customize the default values of the script
 variables. These values can be overridden by command-line arguments. The
@@ -49,3 +49,31 @@ Built-in defaults:
 
 See **date**\ (1) for the accepted format of date and format string
 arguments.
+
+Per-logfile configuration
+-------------------------
+
+In addition to files named 'logfilter/config', the configuration
+directory search path will be searched for files named
+'logfilter/logfiles.conf'. This is the per-logfile configuration file.
+It contains variable–value pairs like the config file described above,
+but each setting must be preceded by a section name in square brackets.
+It might look something like this:
+
+::
+
+   [*app.log]
+   datefmt = +%Y-%m-%dT%H:%M:%S
+   program = $1 > after && $1 <= before && $2 ~ level
+
+If a logfile argument *FILE* matches a section name in a per-logfile
+configuration file, then the variable settings in that section will be
+used for that file. The remainder of the settings will be taken from
+'config' or from the special default section DEFAULT. In the above
+example, any logfile matching the filename pattern '\*app.log' will use
+the values of **datefmt** and **program** from that section.
+
+See **glob**\ (7) for a description of wildcard matching pathnames.
+
+Setting the variables **logfiles** and **batch** in a section other than
+DEFAULT has no effect, because these are program-wide settings.
