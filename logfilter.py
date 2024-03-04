@@ -252,7 +252,7 @@ def read_configuration(
 
     Return a list of files read.
     """
-    cfgs = list(load_config_paths(pathname))
+    cfgs = list(load_config_paths(__prog__, pathname))
     files_read = config.read(reversed(cfgs))
     logging.debug("read configuration from files: %s", files_read)
     return files_read
