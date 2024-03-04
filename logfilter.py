@@ -136,7 +136,7 @@ def main() -> None:
     if "LF_DEBUG" in os.environ:
         logging.basicConfig(level=logging.DEBUG)
     general_defaults = load_defaults(DEFAULTS)
-    cfg = configparser.ConfigParser(defaults=general_defaults)
+    cfg = configparser.ConfigParser(defaults=general_defaults, interpolation=None)
     try:
         read_configuration(cfg, LOGFILES_CONF_PATH)
     except configparser.Error as err:
