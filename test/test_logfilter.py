@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Copyright 2023 Dylan Maltby
+#  Copyright 2023, 2024 Dylan Maltby
 #  SPDX-Licence-Identifier: Apache-2.0
 #
 import unittest
@@ -88,6 +88,12 @@ class TestDateStr(unittest.TestCase):
         epoch = logfilter.datestr("@0", self.default_datefmt)
         now = logfilter.datestr("now", self.default_datefmt)
         self.assertLess(epoch, now)
+
+    def test_errors(self):
+        # You forgot to prefix datefmt with '+'
+        self.assertRaises(SystemExit, logfilter.datestr, datefmt="%Y-%m-%d")
+        # Invalid date
+        self.assertRaises(SystemExit, logfilter.datestr, date="my birthday")
 
 
 class TestAWK(unittest.TestCase):

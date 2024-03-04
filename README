@@ -15,7 +15,7 @@ lines by field -- an overgrown version of this one-liner:
 
 Run-time requirements: Python 3.9+, GNU date, AWK
 
-Copyright 2023 Dylan Maltby
+Copyright 2023, 2024 Dylan Maltby
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

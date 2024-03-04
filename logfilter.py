@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Copyright 2023 Dylan Maltby
+#  Copyright 2023, 2024 Dylan Maltby
 #  SPDX-Licence-Identifier: Apache-2.0
 #
 """Filter some logs using AWK.
@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import argparse
 import collections
+import configparser
+import fnmatch
 import glob
 import logging
 import os
@@ -25,9 +27,10 @@ from collections.abc import Iterable, Iterator, Mapping, MutableMapping
 from typing import Any, Callable, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
-__version__ = "0.1.0"
+__version__ = "0.2.0.dev1"
 
-CONFIG_PATH: str = "config"
+CONFIG_PATH = "config"
+LOGFILES_CONF_PATH = "logfiles.conf"
 LOG_LEVELS: list[str] = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
 DEFAULTS: dict[str, str] = {
     "after": "today-3days",
@@ -95,23 +98,21 @@ def build_cla_parser(defaults: Mapping[str, str]) -> argparse.ArgumentParser:
     parser.add_argument(
         "logfiles",
         nargs="*",
-        default=expand_paths(logfiles),
+        default=list(expand_paths(logfiles)),
         metavar="FILE",
         help=f"filter %(metavar)s(s) or default logfiles: {logfiles}",
     )
     parser.add_argument(
         "-a",
         "--after",
-        default=defaults["after"],
         metavar="DATE",
-        help="filter logs older than %(metavar)s (default: %(default)s)",
+        help="filter logs older than %(metavar)s",
     )
     parser.add_argument(
         "-b",
         "--before",
-        default=defaults["before"],
         metavar="DATE",
-        help="filter logs newer than %(metavar)s (default: %(default)s)",
+        help="filter logs newer than %(metavar)s",
     )
     parser.set_defaults(batch=convert_boolean(defaults["batch"]))
     parser.add_argument(
@@ -124,9 +125,8 @@ def build_cla_parser(defaults: Mapping[str, str]) -> argparse.ArgumentParser:
         "--level",
         type=disambiguate(LOG_LEVELS, str.upper),
         choices=LOG_LEVELS,
-        default=defaults["level"],
         metavar="LEVEL",
-        help="filter logs below %(metavar)s (choose from %(choices)s) (default: %(default)s)",
+        help="filter logs below %(metavar)s (choose from %(choices)s)",
     )
     return parser
 
@@ -135,30 +135,40 @@ def main() -> None:
     """Parsing arguments from sys.argv, print results to sys.stdout."""
     if "LF_DEBUG" in os.environ:
         logging.basicConfig(level=logging.DEBUG)
-    defaults = load_defaults(DEFAULTS)
-    args = build_cla_parser(defaults).parse_args()
+    general_defaults = load_defaults(DEFAULTS)
+    cfg = configparser.ConfigParser(
+        defaults=general_defaults, interpolation=configparser.ExtendedInterpolation()
+    )
+    read_configuration(cfg, LOGFILES_CONF_PATH)
+    cfg_defaults = cfg.defaults()
+    args = build_cla_parser(cfg_defaults).parse_args()
     logging.debug(args)
-    logfiles = list(args.logfiles)
+    logfiles = args.logfiles
     if not logfiles:
         logging.debug("null glob")
         return
-    level = "|".join(LOG_LEVELS[: LOG_LEVELS.index(args.level) + 1])
-    start = datestr(args.after, defaults["datefmt"])
-    end = datestr(args.before, defaults["datefmt"])
-    awk_variables = {"level": level, "after": start, "before": end}
-    if progfile := defaults.get("progfile"):
-        awk_options = {"progfiles": progfile}
-    else:
-        awk_options = {"program_text": defaults["program"]}
-    if args.batch:
-        awk(files=logfiles, **awk_options, variables=awk_variables)
-        return
-    for file in logfiles:
-        print()
-        print("==>", file, "<==")
-        # Flush headers before awk starts writing
-        sys.stdout.flush()
-        awk(files=[file], **awk_options, variables=awk_variables)
+
+    for logfile in logfiles:
+        section = match_section(logfile, cfg) or cfg_defaults
+        level = args.level or section["level"]
+        try:
+            level_regex = "|".join(LOG_LEVELS[: LOG_LEVELS.index(level) + 1])
+        except ValueError:
+            section_name = getattr(section, "name", "DEFAULT")
+            die(f"In section [{section_name}]: invalid level name: {level}")
+        start = datestr(args.after or section["after"], section["datefmt"])
+        end = datestr(args.before or section["before"], section["datefmt"])
+        awk_variables = {"level": level_regex, "after": start, "before": end}
+        if progfile := section.get("progfile"):
+            awk_options = {"progfiles": progfile}
+        else:
+            awk_options = {"program_text": section["program"]}
+        if not args.batch:
+            print()
+            print("==>", logfile, "<==")
+            # Flush headers before awk starts writing
+            sys.stdout.flush()
+        awk(files=[logfile], **awk_options, variables=awk_variables)
 
 
 def awk(
@@ -167,6 +177,7 @@ def awk(
     progfiles: Optional[Iterable[Arg]] = None,
     variables: Optional[Mapping[Any, Any]] = None,
     field_sep: Optional[Arg] = None,
+    executable: Union[str, os.PathLike[str]] = "awk",
 ) -> int:
     """Call `awk` with the given arguments, returning its exit status.
 
@@ -174,7 +185,9 @@ def awk(
         awk [-v variables...] [-F field_sep] [-f progfiles... | program_text]
             [files...]
     """
-    executable = shutil.which("awk") or die("awk: command not found")
+    executable = shutil.which(os.environ.get("LF_AWK", executable)) or die(
+        f"{executable}: command not found"
+    )
     cmds: list[Arg] = [executable]
     if variables is not None:
         for var, value in variables.items():
@@ -188,7 +201,10 @@ def awk(
             cmds += ["-f", program_file]
         cmds += ["--", *files]
     logging.debug(cmds)
-    proc = subprocess.run(cmds, check=True)
+    try:
+        proc = subprocess.run(cmds, check=True)
+    except subprocess.CalledProcessError as err:
+        die(str(err))
     return proc.returncode
 
 
@@ -229,6 +245,29 @@ def load_defaults(defaults: MutableMapping[str, str]) -> collections.ChainMap[st
     return collections.ChainMap(*maps, defaults)
 
 
+def read_configuration(
+    config: configparser.ConfigParser, pathname: Union[str, os.PathLike[str]]
+) -> list[str]:
+    """Load configuration files into *config*.
+
+    Return a list of files read.
+    """
+    cfgs = list(load_config_paths(pathname))
+    files_read = config.read(reversed(cfgs))
+    logging.debug("read configuration from files: %s", files_read)
+    return files_read
+
+
+def match_section(
+    name: str, config: configparser.ConfigParser
+) -> Optional[configparser.SectionProxy]:
+    """Return a section of config if its name fnmatches *name*."""
+    for section in config.sections():
+        if fnmatch.fnmatch(name, section):
+            return config[section]
+    return None
+
+
 def parse_kv_config(reader: Iterable[str]) -> dict[str, str]:
     """Return a dict of keys to values parsed from lines of text in *reader*.
 
@@ -250,15 +289,22 @@ def parse_kv_config(reader: Iterable[str]) -> dict[str, str]:
     return symbols
 
 
-def datestr(date: str, datefmt: str) -> str:
+def datestr(date: Optional[str] = None, datefmt: Optional[str] = None) -> str:
     """Call `date` with the given arguments and return its stdout as a string.
 
     ::
-        $(date --date ${date} ${datefmt})
+        $(date [--date ${date}] [${datefmt}])
     """
     executable = shutil.which("date") or die("date: command not found")
-    cmds = [executable, "--date", date, datefmt]
-    proc = subprocess.run(cmds, check=True, stdout=subprocess.PIPE)
+    cmds = [executable]
+    if date is not None:
+        cmds += ["--date", date]
+    if datefmt is not None:
+        cmds.append(datefmt)
+    try:
+        proc = subprocess.run(cmds, check=True, stdout=subprocess.PIPE)
+    except subprocess.CalledProcessError as err:
+        die(str(err))
     return proc.stdout.decode().strip()
 
 
