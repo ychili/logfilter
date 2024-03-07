@@ -13,6 +13,9 @@ lines by field -- an overgrown version of this one-liner:
       '$1 > after && $1 <= before && $3 ~ level' \
       ${logfiles}
 
+The goal is to produce a digestible screenful of the most recent and
+most urgent log messages.
+
 Run-time requirements: Python 3.9+, GNU date, AWK
 
 Copyright 2023, 2024 Dylan Maltby
