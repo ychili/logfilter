@@ -27,7 +27,7 @@ from collections.abc import Iterable, Iterator, Mapping, MutableMapping
 from typing import Any, Callable, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
-__version__ = "0.2.0.dev1"
+__version__ = "0.2.0"
 
 CONFIG_PATH = "config"
 LOGFILES_CONF_PATH = "logfiles.conf"
