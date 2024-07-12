@@ -36,4 +36,4 @@ test:
 	$(PYTHON) -m doctest logfilter.py
 	$(PYTHON) test/test_logfilter.py
 
-.PHONY: clean pylint mypy test
+.PHONY: doctxts clean lint pylint mypy test
