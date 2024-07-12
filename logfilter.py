@@ -187,6 +187,7 @@ def _set_awk_options(section: Mapping[str, str]) -> dict[str, str]:
     return {"program_text": section["program"]}
 
 
+# pylint: disable=too-many-arguments
 def awk(
     files: Iterable[Arg],
     program_text: Optional[Arg] = None,
