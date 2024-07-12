@@ -255,6 +255,11 @@ def load_defaults(defaults: MutableMapping[str, str]) -> collections.ChainMap[st
         except OSError:
             logging.debug("found config file but couldn't open for reading: %s", cfg)
             continue
+        except UnicodeDecodeError as err:
+            logging.debug(
+                "found config file but couldn't decode as UTF-8: %s: %s", err, cfg
+            )
+            continue
         with file:
             maps.append(parse_kv_config(file))
             logging.debug("read configuration from file: %s", cfg)
