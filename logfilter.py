@@ -23,8 +23,8 @@ import shlex
 import shutil
 import subprocess
 import sys
-from collections.abc import Iterable, Iterator, Mapping, MutableMapping
-from typing import Any, Callable, NoReturn, Optional, Union
+from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
+from typing import Any, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
 __version__ = "0.2.0"
