@@ -1,10 +1,51 @@
-Usage
-=====
+===========
+ logfilter
+===========
 
-.. include:: include/help.txt
-   :literal:
+--------------------------------------------
+filter some logs based on date and log level
+--------------------------------------------
 
-Configuration
+:Version: logfilter 0.2.0
+:Date: 2024-09-14
+:Manual section: 1
+
+SYNOPSIS
+========
+
+**logfilter** [**-h**] [**-a** *DATE*] [**-b** *DATE*] [**--batch** \|
+**--no-batch**] [**-l** *LEVEL*] [*FILE* ...]
+
+DESCRIPTION
+===========
+
+**logfilter** prints lines from log files which match the given date
+range and severity level.
+The goal is to produce a digestible screenful of the most recent and
+most urgent log messages.
+
+OPTIONS
+=======
+
+-h, --help            Print a short help message and exit.
+
+-a DATE, --after=DATE
+    Filter logs older than *DATE*.
+    *DATE* can be any date string understood by the ``--date`` option
+    of GNU **date**\ (1).
+
+-b DATE, --before=DATE
+    Filter logs newer than *DATE*.
+    The format of *DATE* is the same as for ``--after`` above.
+
+--batch, --no-batch   Don't print headers giving file names.
+
+-l LEVEL, --level=LEVEL
+    Filter logs below *LEVEL*.
+    *LEVEL* can be one of {CRITICAL, ERROR, WARNING, INFO, DEBUG}
+    or its abbreviation.
+
+CONFIGURATION
 =============
 
 Create a config file to customize the default values of the script
@@ -77,3 +118,13 @@ See **glob**\ (7) for a description of wildcard matching pathnames.
 
 Setting the variables **logfiles** and **batch** in a section other than
 DEFAULT has no effect, because these are program-wide settings.
+
+FILES
+=====
+
+*/etc/xdg/logfilter/*\ {*config*,\ *logfiles.conf*}
+    System configuration files
+
+*~/.config/logfilter/*\ {*config*,\ *logfiles.conf*}
+    User configuration files
+

@@ -1,16 +1,15 @@
 PYTHON ?= python3
 
 includedir := doc/include
-helpfile := $(includedir)/help.txt
 defaultsfile := $(includedir)/defaults.txt
 
-doctxts: $(helpfile) $(defaultsfile)
+datadir := data
+mandir := $(datadir)/share/man/man1
 
-$(helpfile): logfilter.py | $(includedir)
-	COLUMNS=80 $(PYTHON) \
-		-c 'import logfilter; \
-		    logfilter.build_cla_parser(logfilter.DEFAULTS).print_help()' \
-		> $(helpfile)
+
+doc: manpages
+
+manpages: $(mandir)/logfilter.1.gz
 
 $(defaultsfile): logfilter.py | $(includedir)
 	$(PYTHON) \
@@ -21,8 +20,15 @@ $(defaultsfile): logfilter.py | $(includedir)
 $(includedir):
 	mkdir $(includedir)
 
+$(mandir)/logfilter.1.gz: doc/logfilter.1.rst $(defaultsfile) | $(mandir)
+	rst2man --config=doc/docutils.conf $< \
+		| gzip -9 > $@
+
+$(mandir):
+	mkdir -p $(mandir)
+
 clean:
-	rm -rf $(includedir)
+	rm -rf $(includedir) $(datadir)
 
 lint: pylint mypy
 
@@ -36,4 +42,4 @@ test:
 	$(PYTHON) -m doctest logfilter.py
 	$(PYTHON) test/test_logfilter.py
 
-.PHONY: doctxts clean lint pylint mypy test
+.PHONY: doc manpages clean lint pylint mypy test

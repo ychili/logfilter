@@ -23,6 +23,9 @@ include = [
 	"doc/",
 ]
 
+[tool.flit.external-data]
+directory = "data"
+
 [tool.isort]
 profile = "black"
 skip_gitignore = true
