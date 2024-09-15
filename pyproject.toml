@@ -1,6 +1,27 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.7,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "logfilter"
+dynamic = ["version"]
+authors = [{name = "Dylan Maltby"}]
+license = {file = "LICENSE"}
+description = "Filter some logs using AWK"
+readme = {file = "README", content-type = "text/plain"}
+requires-python = ">=3.9"
+classifiers = [
+	"License :: OSI Approved :: Apache Software License",
+]
+
+[project.scripts]
+logfilter = "logfilter:main"
+
+[tool.flit.sdist]
+include = [
+	"Makefile",
+	"doc/",
+]
 
 [tool.isort]
 profile = "black"
