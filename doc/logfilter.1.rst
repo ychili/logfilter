@@ -6,8 +6,11 @@
 filter some logs based on date and log level
 --------------------------------------------
 
-:Version: logfilter 0.2.0
-:Date: 2024-09-14
+.. include:: include/metadata.rst
+   :start-line: 1
+
+:Version: logfilter |version|
+:Date: |date|
 :Manual section: 1
 
 SYNOPSIS
@@ -127,4 +130,3 @@ FILES
 
 *~/.config/logfilter/*\ {*config*,\ *logfiles.conf*}
     User configuration files
-
