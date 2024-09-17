@@ -3,6 +3,10 @@
 #  Copyright 2023, 2024 Dylan Maltby
 #  SPDX-Licence-Identifier: Apache-2.0
 #
+# pylint: disable=missing-class-docstring,missing-function-docstring
+
+"""Unit tests for logfilter"""
+
 import unittest
 
 import logfilter

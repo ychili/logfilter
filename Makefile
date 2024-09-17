@@ -47,7 +47,7 @@ clean:
 lint: pylint mypy
 
 pylint:
-	pylint logfilter.py
+	pylint $$(git ls-files '*.py')
 
 mypy:
 	mypy --strict logfilter.py

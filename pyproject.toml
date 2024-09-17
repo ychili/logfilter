@@ -33,6 +33,9 @@ skip_gitignore = true
 [tool.mypy]
 python_version = "3.9"
 
+[tool.pylint.main]
+py-version = "3.9"
+
 [tool.pylint.basic]
 docstring-min-length = 4
 
