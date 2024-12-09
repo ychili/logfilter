@@ -45,7 +45,8 @@ OPTIONS
 
 -l LEVEL, --level=LEVEL
     Filter logs below *LEVEL*.
-    *LEVEL* can be one of {CRITICAL, ERROR, WARNING, INFO, DEBUG}
+    *LEVEL* can be one of
+    {EMERG, ALERT, CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG}
     or its abbreviation.
 
 CONFIGURATION

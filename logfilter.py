@@ -27,11 +27,21 @@ from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMappin
 from typing import Any, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
-__version__ = "0.2.1"
+__version__ = "0.3.0b1"
 
 CONFIG_PATH = "config"
 LOGFILES_CONF_PATH = "logfiles.conf"
-LOG_LEVELS: list[str] = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+# LOGGING_DISPLAY_NAMES
+LOG_LEVELS: list[str] = [
+    "EMERG",
+    "ALERT",
+    "CRITICAL",
+    "ERROR",
+    "WARNING",
+    "NOTICE",
+    "INFO",
+    "DEBUG",
+]
 DEFAULTS: dict[str, str] = {
     "after": "today-3days",
     "before": "today+1day",

@@ -9,7 +9,7 @@ lines by field -- an overgrown version of this one-liner:
     awk \
       -v after=$(date --date=today-3days +%Y-%m-%d) \
       -v before=$(date --date=today+1day +%Y-%m-%d) \
-      -v level='CRITICAL|ERROR|WARNING|INFO' \
+      -v level='EMERG|ALERT|CRITICAL|ERROR|WARNING|NOTICE' \
       '$1 > after && $1 <= before && $3 ~ level' \
       ${logfiles}
 
