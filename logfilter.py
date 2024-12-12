@@ -143,7 +143,7 @@ def build_cla_parser(defaults: Mapping[str, str]) -> argparse.ArgumentParser:
 
 def main() -> None:
     """Parsing arguments from sys.argv, print results to sys.stdout."""
-    if "LF_DEBUG" in os.environ:
+    if os.environ.get("LF_DEBUG"):
         logging.basicConfig(level=logging.DEBUG)
     general_defaults = load_defaults(DEFAULTS)
     cfg = configparser.ConfigParser(defaults=general_defaults, interpolation=None)
