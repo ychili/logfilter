@@ -51,6 +51,7 @@ pylint:
 
 mypy:
 	mypy --strict logfilter.py
+	mypy test/test_logfilter.py
 
 test:
 	$(PYTHON) -m doctest logfilter.py
