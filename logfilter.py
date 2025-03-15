@@ -201,6 +201,7 @@ def _set_awk_options(section: Mapping[str, str]) -> dict[str, str]:
 def awk(
     files: Iterable[Arg],
     program_text: Optional[Arg] = None,
+    *,
     progfiles: Optional[Iterable[Arg]] = None,
     variables: Optional[Mapping[Any, Any]] = None,
     field_sep: Optional[Arg] = None,
