@@ -213,10 +213,10 @@ def awk(
         awk [-v variables...] [-F field_sep] [-f progfiles... | program_text]
             [files...]
     """
-    executable = shutil.which(os.environ.get("LF_AWK", executable)) or die(
+    exe_path = shutil.which(os.environ.get("LF_AWK", executable)) or die(
         f"{executable}: command not found"
     )
-    cmds: list[Arg] = [executable]
+    cmds: list[Arg] = [exe_path]
     if variables is not None:
         for var, value in variables.items():
             cmds += ["-v", f"{var}={value}"]
