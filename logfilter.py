@@ -23,6 +23,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import types
 from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
 from typing import Any, NoReturn, Optional, Union
 
@@ -64,6 +65,17 @@ BOOLEAN_STATES: dict[str, bool] = {
 
 # Argument type for cmds of subprocess.run
 Arg = Union[str, bytes, os.PathLike[str], os.PathLike[bytes]]
+
+
+# pylint: disable=too-few-public-methods
+class Args(types.SimpleNamespace):
+    """Namespace for parsed command-line arguments"""
+
+    logfiles: list[str]
+    after: str | None
+    before: str | None
+    batch: bool
+    level: str | None
 
 
 def disambiguate(
@@ -152,7 +164,7 @@ def main() -> None:
     except configparser.Error as err:
         die(f"Error with configuration file: {err}")
     cfg_defaults = cfg.defaults()
-    args = build_cla_parser(cfg_defaults).parse_args()
+    args = build_cla_parser(cfg_defaults).parse_args(namespace=Args())
     logging.debug(args)
     logfiles = args.logfiles
     if not logfiles:
@@ -174,9 +186,7 @@ def main() -> None:
         awk(files=[logfile], **awk_options, variables=awk_variables)
 
 
-def _set_awk_variables(
-    args: argparse.Namespace, section: Mapping[str, str]
-) -> dict[str, str]:
+def _set_awk_variables(args: Args, section: Mapping[str, str]) -> dict[str, str]:
     awk_variables = {}
     level = args.level or section["level"]
     try:
