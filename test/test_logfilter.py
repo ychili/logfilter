@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Copyright 2023, 2024 Dylan Maltby
+#  Copyright 2023–2025 Dylan Maltby
 #  SPDX-Licence-Identifier: Apache-2.0
 #
 # pylint: disable=missing-class-docstring,missing-function-docstring
