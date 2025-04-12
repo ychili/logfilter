@@ -7,9 +7,39 @@
 
 """Unit tests for logfilter"""
 
+import os
+import os.path
+import tempfile
 import unittest
 
 import logfilter
+
+
+class TestLoadConfigPaths(unittest.TestCase):
+    def setUp(self):
+        self.environ_save = os.environ.copy()
+
+    def tearDown(self):
+        # Restore environment variables.
+        os.environ = self.environ_save.copy()
+
+    def test_load_config_paths(self):
+        """
+        Procedure adapted from:
+        https://github.com/takluyver/pyxdg/blob/master/test/test_basedirectory.py#L81
+        """
+        _dirname = "test_load_config_paths0"
+        tmpdir0 = tempfile.TemporaryDirectory()
+        home_path = os.path.join(tmpdir0.name, _dirname)
+        tmpdir1 = tempfile.TemporaryDirectory()
+        etc_path = os.path.join(tmpdir1.name, _dirname)
+        with tmpdir0, tmpdir1:
+            os.mkdir(home_path)
+            os.mkdir(etc_path)
+            os.environ["XDG_CONFIG_HOME"] = tmpdir0.name
+            os.environ["XDG_CONFIG_DIRS"] = f"{tmpdir1.name}:/etc/xdg"
+            config_dirs = logfilter.load_config_paths(_dirname)
+            self.assertEqual(list(config_dirs), [home_path, etc_path])
 
 
 class TestKVParse(unittest.TestCase):
