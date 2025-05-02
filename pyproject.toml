@@ -21,6 +21,7 @@ logfilter = "logfilter:main"
 include = [
 	"Makefile",
 	"doc/",
+	"test/",
 ]
 
 [tool.flit.external-data]
