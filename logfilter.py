@@ -24,7 +24,14 @@ import shutil
 import subprocess
 import sys
 import types
-from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
+from collections.abc import (
+    Callable,
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 from typing import Any, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
@@ -153,8 +160,8 @@ def build_cla_parser(defaults: Mapping[str, str]) -> argparse.ArgumentParser:
     return parser
 
 
-def main() -> None:
-    """Parsing arguments from sys.argv, print results to sys.stdout."""
+def main(argv: Sequence[str] | None = None) -> None:
+    """Parsing arguments from *argv*, print results to sys.stdout."""
     if os.environ.get("LF_DEBUG"):
         logging.basicConfig(level=logging.DEBUG)
     general_defaults = load_defaults(DEFAULTS)
@@ -164,7 +171,7 @@ def main() -> None:
     except configparser.Error as err:
         die(f"Error with configuration file: {err}")
     cfg_defaults = cfg.defaults()
-    args = build_cla_parser(cfg_defaults).parse_args(namespace=Args())
+    args = build_cla_parser(cfg_defaults).parse_args(argv, namespace=Args())
     logging.debug(args)
     logfiles = args.logfiles
     if not logfiles:
