@@ -53,6 +53,7 @@ mypy:
 	mypy --strict logfilter.py
 	mypy test
 
+# This target runs tests that only depend on the standard library.
 test:
 	$(PYTHON) -m doctest logfilter.py
 	$(PYTHON) test/test_logfilter.py
