@@ -15,6 +15,22 @@ import unittest
 import logfilter
 
 
+class TestDisambiguate(unittest.TestCase):
+    _NAMES = frozenset({"a", "aa", "ab", "ac", "ade"})
+
+    def test_checker(self):
+        checker = logfilter.disambiguate(self._NAMES)
+        self.assertEqual(checker("b"), "b")
+        self.assertEqual(checker("a"), "a")
+        self.assertEqual(checker("aa"), "aa")
+        self.assertEqual(checker("ad"), "ade")
+
+    def test_no_copy(self):
+        checker = logfilter.disambiguate(iter(self._NAMES))
+        self.assertEqual(checker("ad"), "ade")
+        self.assertEqual(checker("ad"), "ad")
+
+
 class TestLoadConfigPaths(unittest.TestCase):
     def setUp(self):
         self.environ_save = os.environ.copy()
