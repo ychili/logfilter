@@ -7,6 +7,7 @@
 
 """Unit tests for logfilter"""
 
+import functools
 import os
 import os.path
 import tempfile
@@ -56,6 +57,38 @@ class TestLoadConfigPaths(unittest.TestCase):
             os.environ["XDG_CONFIG_DIRS"] = f"{tmpdir1.name}:/etc/xdg"
             config_dirs = logfilter.load_config_paths(_dirname)
             self.assertEqual(list(config_dirs), [home_path, etc_path])
+
+
+class TestMatchSection(unittest.TestCase):
+    def setUp(self):
+        self.config = logfilter.configparser.ConfigParser(interpolation=None)
+        self.func = functools.partial(
+            logfilter.get_matching_settings, config=self.config
+        )
+
+    def test_redundant_default(self):
+        self.assertFalse(self.func(""), "An empty config won't ever match.")
+        self.config.read_dict({"DEFAULT": {"1": "default"}, "*": {"2": "*"}})
+        all_defaults = self.func("")
+        self.assertEqual(all_defaults["1"], "default")
+        self.assertEqual(all_defaults["2"], "*")
+        self.config.read_dict({"ab*": {"3": "ab*"}})
+        matched_settings = self.func("abc")
+        self.assertEqual(matched_settings["1"], "default")
+        self.assertEqual(matched_settings["2"], "*")
+        self.assertEqual(matched_settings["3"], "ab*")
+
+    def test_later_override(self):
+        self.config.read_dict({"DEFAULT": {"1": "default"}})
+        self.assertFalse(self.func(""), "A DEFAULT-only config won't ever match.")
+        self.config.read_dict({"b": {"2": "b"}})
+        one_section = self.func("b")
+        self.assertEqual(one_section["1"], "default")
+        self.assertEqual(one_section["2"], "b")
+        self.config.read_dict({"*": {"2": "*"}})
+        overridden = self.func("b")
+        self.assertEqual(overridden["1"], "default")
+        self.assertEqual(overridden["2"], "*")
 
 
 class TestKVParse(unittest.TestCase):

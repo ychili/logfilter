@@ -179,7 +179,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         return
 
     for logfile in logfiles:
-        section = match_section(logfile, cfg) or cfg_defaults
+        section = get_matching_settings(logfile, cfg) or cfg_defaults
         try:
             awk_variables = _set_awk_variables(args, section)
             awk_options = _set_awk_options(section)
@@ -308,14 +308,23 @@ def read_configuration(
     return files_read
 
 
-def match_section(
+def get_matching_settings(
     name: str, config: configparser.ConfigParser
-) -> Optional[configparser.SectionProxy]:
-    """Return a section of config if its name fnmatches *name*."""
-    for section in config.sections():
-        if fnmatch.fnmatch(name, section):
-            return config[section]
-    return None
+) -> collections.ChainMap[str, str]:
+    """Return settings from sections in *config* that fnmatch *name*.
+
+    If there are multiple sections that match *name*, settings from later
+    sections override those from earlier sections.
+    """
+    # Reverse sections so that they are in the correct order for ChainMap,
+    # i.e. the _later_ matching sections are placed _first_ the ChainMap
+    # lookup sequence.
+    sections = (
+        config[section]
+        for section in reversed(config.sections())
+        if fnmatch.fnmatch(name, section)
+    )
+    return collections.ChainMap(*sections)
 
 
 def parse_kv_config(reader: Iterable[str]) -> dict[str, str]:

@@ -117,6 +117,10 @@ used for that file. The remainder of the settings will be taken from
 'config' or from the special default section DEFAULT. In the above
 example, any logfile matching the filename pattern '\*app.log' will use
 the values of **datefmt** and **program** from that section.
+If multiple section names match a *FILE* name, settings from later
+matching sections will override settings from earlier sections.
+So, as an example, a section named '\*' will override settings in all
+preceding sections, because '\*' will match any name.
 
 See **glob**\ (7) for a description of wildcard matching pathnames.
 
