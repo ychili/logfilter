@@ -70,7 +70,7 @@ def test_with_batch(
     capfdbinary: pytest.CaptureFixture[bytes],
     options: Sequence[str],
     expected: list[bytes],
-):
+) -> None:
     """Test the "happy path"."""
     log_path = filewriter(b"".join(CONTENTS))
     logfilter.main(["--batch", *options, str(log_path)])

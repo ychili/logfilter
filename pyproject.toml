@@ -38,7 +38,7 @@ warn_unused_configs = true
 warn_redundant_casts = true
 
 [[tool.mypy.overrides]]
-module = ["logfilter"]
+module = ["logfilter", "test.test_main"]
 # Turn on strict type checking for select modules.
 # These are all "mypy --strict" options listed in
 # https://mypy.readthedocs.io/en/stable/existing_code.html#introduce-stricter-options
