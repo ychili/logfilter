@@ -47,11 +47,10 @@ clean:
 lint: pylint mypy
 
 pylint:
-	pylint $$(git ls-files '*.py')
+	tox run -e pylint-py311 -- $$(git ls-files '*.py')
 
 mypy:
-	mypy --strict logfilter.py
-	mypy test
+	tox run -e mypy -- *.py test
 
 # This target runs tests that only depend on the standard library.
 test:
