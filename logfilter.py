@@ -35,7 +35,7 @@ from collections.abc import (
 from typing import Any, NoReturn, Optional, Union
 
 __prog__ = "logfilter"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 CONFIG_PATH = "config"
 LOGFILES_CONF_PATH = "logfiles.conf"
