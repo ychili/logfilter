@@ -108,9 +108,7 @@ class TestKVParse(unittest.TestCase):
         "Any line without an equals sign will also be ignored.\n",
     ]
 
-    @staticmethod
-    def func(strings):
-        return logfilter.parse_kv_config(strings)
+    func = staticmethod(logfilter.parse_kv_config)
 
     def test_basic(self):
         results = self.func(self.basic)
