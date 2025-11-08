@@ -265,9 +265,10 @@ def load_config_paths(*resource: Union[str, os.PathLike[str]]) -> Iterator[str]:
     xdg_config_home = os.environ.get("XDG_CONFIG_HOME") or os.path.join(
         os.path.expanduser("~"), ".config"
     )
-    xdg_config_dirs = [xdg_config_home] + (
-        os.environ.get("XDG_CONFIG_DIRS") or "/etc/xdg"
-    ).split(":")
+    xdg_config_dirs = [
+        xdg_config_home,
+        *(os.environ.get("XDG_CONFIG_DIRS") or "/etc/xdg").split(":"),
+    ]
     resource_path = os.path.join(*resource)
     for config_dir in xdg_config_dirs:
         path = os.path.join(config_dir, resource_path)
