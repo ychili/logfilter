@@ -38,7 +38,11 @@ class TestLoadConfigPaths(unittest.TestCase):
 
     def tearDown(self):
         # Restore environment variables.
-        os.environ = self.environ_save.copy()
+        # Assigning to os.environ does not clear the environment.
+        # Therefore, set values one by one.
+        os.environ.clear()
+        for name, value in self.environ_save.items():
+            os.environ[name] = value
 
     def test_load_config_paths(self):
         """
