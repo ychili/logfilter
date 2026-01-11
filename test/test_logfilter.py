@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Copyright 2023–2025 Dylan Maltby
+#  Copyright 2023–2026 Dylan Maltby
 #  SPDX-Licence-Identifier: Apache-2.0
 #
 # pylint: disable=missing-class-docstring,missing-function-docstring
@@ -21,24 +21,24 @@ import logfilter
 class TestDisambiguate(unittest.TestCase):
     _NAMES = frozenset({"a", "aa", "ab", "ac", "ade"})
 
-    def test_checker(self):
+    def test_checker(self) -> None:
         checker = logfilter.disambiguate(self._NAMES)
         self.assertEqual(checker("b"), "b")
         self.assertEqual(checker("a"), "a")
         self.assertEqual(checker("aa"), "aa")
         self.assertEqual(checker("ad"), "ade")
 
-    def test_no_copy(self):
+    def test_no_copy(self) -> None:
         checker = logfilter.disambiguate(iter(self._NAMES))
         self.assertEqual(checker("ad"), "ade")
         self.assertEqual(checker("ad"), "ad")
 
 
 class TestLoadConfigPaths(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.environ_save = os.environ.copy()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         # Restore environment variables.
         # Assigning to os.environ does not clear the environment.
         # Therefore, set values one by one.
@@ -46,7 +46,7 @@ class TestLoadConfigPaths(unittest.TestCase):
         for name, value in self.environ_save.items():
             os.environ[name] = value
 
-    def test_load_config_paths(self):
+    def test_load_config_paths(self) -> None:
         """
         Procedure adapted from:
         https://github.com/takluyver/pyxdg/blob/master/test/test_basedirectory.py#L81
@@ -66,13 +66,13 @@ class TestLoadConfigPaths(unittest.TestCase):
 
 
 class TestMatchSection(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.config = configparser.ConfigParser(interpolation=None)
         self.func = functools.partial(
             logfilter.get_matching_settings, config=self.config
         )
 
-    def test_redundant_default(self):
+    def test_redundant_default(self) -> None:
         self.assertFalse(self.func(""), "An empty config won't ever match.")
         self.config.read_dict({"DEFAULT": {"1": "default"}, "*": {"2": "*"}})
         all_defaults = self.func("")
@@ -84,7 +84,7 @@ class TestMatchSection(unittest.TestCase):
         self.assertEqual(matched_settings["2"], "*")
         self.assertEqual(matched_settings["3"], "ab*")
 
-    def test_later_override(self):
+    def test_later_override(self) -> None:
         self.config.read_dict({"DEFAULT": {"1": "default"}})
         self.assertFalse(self.func(""), "A DEFAULT-only config won't ever match.")
         self.config.read_dict({"b": {"2": "b"}})
@@ -116,31 +116,31 @@ class TestKVParse(unittest.TestCase):
 
     func = staticmethod(logfilter.parse_kv_config)
 
-    def test_basic(self):
+    def test_basic(self) -> None:
         results = self.func(self.basic)
         self.assertEqual(results, {"key1": '"${HOME}"/logs'})
 
-    def test_trailing(self):
+    def test_trailing(self) -> None:
         results = self.func(self.trailing)
         self.assertEqual(
             results, {"key1": "value", "key2": "value  # This comment is not discarded"}
         )
 
-    def test_spacing(self):
+    def test_spacing(self) -> None:
         results = self.func(self.spacing)
         self.assertEqual(
             results, {"normalkey": "No line breaks please", "key with spaces": "Value"}
         )
 
-    def test_punctuation(self):
+    def test_punctuation(self) -> None:
         results = self.func(self.punctuation)
         self.assertEqual(results, {"equalssign": "2 + 2 = 4"})
 
-    def test_empty_components(self):
+    def test_empty_components(self) -> None:
         results = self.func(self.empty)
         self.assertEqual(results, {"keywithnovalue": "", "": ""})
 
-    def test_ignored_lines(self):
+    def test_ignored_lines(self) -> None:
         results = self.func(self.ignore)
         self.assertEqual(results, {})
 
@@ -148,33 +148,33 @@ class TestKVParse(unittest.TestCase):
 class TestDateStr(unittest.TestCase):
     default_datefmt = logfilter.DEFAULTS["datefmt"]
 
-    def test_availability(self):
+    def test_availability(self) -> None:
         """Check if `date` is installed on $PATH."""
         self.assertIsNotNone(shutil.which("date"), "'date' is not installed on $PATH")
 
-    def test_default_values(self):
+    def test_default_values(self) -> None:
         for value in (logfilter.DEFAULTS["after"], logfilter.DEFAULTS["before"]):
             # Just check datestr doesn't throw any exceptions.
             self.assertIsInstance(logfilter.datestr(value, self.default_datefmt), str)
 
-    def test_relative_items(self):
+    def test_relative_items(self) -> None:
         today = logfilter.datestr("today", self.default_datefmt)
         month_ago = logfilter.datestr("month ago", self.default_datefmt)
         self.assertLess(month_ago, today)
         last_tuesday = logfilter.datestr("last Tuesday", self.default_datefmt)
         self.assertLess(last_tuesday, today)
 
-    def test_pure_numbers(self):
+    def test_pure_numbers(self) -> None:
         today = logfilter.datestr("today", self.default_datefmt)
         ago = logfilter.datestr("20200721", self.default_datefmt)
         self.assertLess(ago, today)
 
-    def test_seconds_since_the_epoch(self):
+    def test_seconds_since_the_epoch(self) -> None:
         epoch = logfilter.datestr("@0", self.default_datefmt)
         now = logfilter.datestr("now", self.default_datefmt)
         self.assertLess(epoch, now)
 
-    def test_errors(self):
+    def test_errors(self) -> None:
         # You forgot to prefix datefmt with '+'
         self.assertRaises(SystemExit, logfilter.datestr, datefmt="%Y-%m-%d")
         # Invalid date
@@ -182,7 +182,7 @@ class TestDateStr(unittest.TestCase):
 
 
 class TestAWK(unittest.TestCase):
-    def test_availability(self):
+    def test_availability(self) -> None:
         """Check if `awk` is installed on $PATH."""
         self.assertIsNotNone(shutil.which("awk"), "'awk' is not installed on $PATH")
 

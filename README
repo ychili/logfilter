@@ -18,7 +18,7 @@ most urgent log messages.
 
 Run-time requirements: Python 3.9+, GNU date, AWK
 
-Copyright 2023-2025 Dylan Maltby
+Copyright 2023-2026 Dylan Maltby
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

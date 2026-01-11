@@ -35,11 +35,6 @@ skip_gitignore = true
 [tool.mypy]
 python_version = "3.9"
 strict = true
-disallow_untyped_defs = false
-
-[[tool.mypy.overrides]]
-module = ["logfilter", "test.test_main"]
-disallow_untyped_defs = true
 
 [tool.pylint.main]
 py-version = "3.9"
