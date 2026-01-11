@@ -7,9 +7,11 @@
 
 """Unit tests for logfilter"""
 
+import configparser
 import functools
 import os
 import os.path
+import shutil
 import tempfile
 import unittest
 
@@ -65,7 +67,7 @@ class TestLoadConfigPaths(unittest.TestCase):
 
 class TestMatchSection(unittest.TestCase):
     def setUp(self):
-        self.config = logfilter.configparser.ConfigParser(interpolation=None)
+        self.config = configparser.ConfigParser(interpolation=None)
         self.func = functools.partial(
             logfilter.get_matching_settings, config=self.config
         )
@@ -148,9 +150,7 @@ class TestDateStr(unittest.TestCase):
 
     def test_availability(self):
         """Check if `date` is installed on $PATH."""
-        self.assertIsNotNone(
-            logfilter.shutil.which("date"), "'date' is not installed on $PATH"
-        )
+        self.assertIsNotNone(shutil.which("date"), "'date' is not installed on $PATH")
 
     def test_default_values(self):
         for value in (logfilter.DEFAULTS["after"], logfilter.DEFAULTS["before"]):
@@ -184,9 +184,7 @@ class TestDateStr(unittest.TestCase):
 class TestAWK(unittest.TestCase):
     def test_availability(self):
         """Check if `awk` is installed on $PATH."""
-        self.assertIsNotNone(
-            logfilter.shutil.which("awk"), "'awk' is not installed on $PATH"
-        )
+        self.assertIsNotNone(shutil.which("awk"), "'awk' is not installed on $PATH")
 
 
 if __name__ == "__main__":

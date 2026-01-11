@@ -34,28 +34,12 @@ skip_gitignore = true
 
 [tool.mypy]
 python_version = "3.9"
-warn_unused_configs = true
-warn_redundant_casts = true
+strict = true
+disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = ["logfilter", "test.test_main"]
-# Turn on strict type checking for select modules.
-# These are all "mypy --strict" options listed in
-# https://mypy.readthedocs.io/en/stable/existing_code.html#introduce-stricter-options
-# with the exception of warn_redundant_casts and warn_unused_configs,
-# which are global.
-warn_unused_ignores = true
-strict_equality = true
-strict_concatenate = true
-check_untyped_defs = true
-disallow_subclassing_any = true
-disallow_untyped_decorators = true
-disallow_any_generics = true
-disallow_untyped_calls = true
-disallow_incomplete_defs = true
 disallow_untyped_defs = true
-no_implicit_reexport = true
-warn_return_any = true
 
 [tool.pylint.main]
 py-version = "3.9"
