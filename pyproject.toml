@@ -24,6 +24,11 @@ classifiers = [
 [project.scripts]
 logfilter = "logfilter:main"
 
+[dependency-groups]
+test = [
+	"pytest>=6,<8.5",
+]
+
 [tool.flit.sdist]
 include = [
 	"Makefile",
