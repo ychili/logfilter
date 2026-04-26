@@ -29,37 +29,29 @@ test = [
 	"pytest>=6,<8.5",
 ]
 
-[tool.flit.sdist]
-include = [
+[tool.flit]
+external-data.directory = "data"
+sdist.include = [
 	"Makefile",
 	"doc/",
 	"test/",
 	"tox.ini",
 ]
 
-[tool.flit.external-data]
-directory = "data"
-
 [tool.isort]
 profile = "black"
 skip_gitignore = true
 
+[tool.pylint]
+basic.docstring-min-length = 4
+format.max-line-length = 100
+main.py-version = "3.9"
+string.check-quote-consistency = true
+string.check-str-concat-over-line-jumps = true
+
 [tool.mypy]
 python_version = "3.9"
 strict = true
-
-[tool.pylint.main]
-py-version = "3.9"
-
-[tool.pylint.basic]
-docstring-min-length = 4
-
-[tool.pylint.format]
-max-line-length = 100
-
-[tool.pylint.string]
-check-quote-consistency = true
-check-str-concat-over-line-jumps = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
