@@ -7,7 +7,7 @@
 
 Depends on:
 -  AWK
--  GNU date
+-  Coreutils date
 """
 
 from __future__ import annotations

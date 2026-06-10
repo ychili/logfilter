@@ -16,7 +16,8 @@ lines by field -- an overgrown version of this one-liner:
 The goal is to produce a digestible screenful of the most recent and
 most urgent log messages.
 
-Run-time requirements: Python 3.9+, GNU date, AWK
+Run-time requirements:
+Python 3.9+, GNU Coreutils (or Coreutils-compatible) date, AWK
 
 Copyright 2023-2026 Dylan Maltby
 

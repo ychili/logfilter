@@ -35,11 +35,11 @@ OPTIONS
 -a DATE, --after=DATE
     Filter logs older than *DATE*.
     *DATE* can be any date string understood by the ``--date`` option
-    of GNU **date**\ (1).
+    of GNU Coreutils or Coreutils-compatible **date**\ (1).
 
 -b DATE, --before=DATE
     Filter logs newer than *DATE*.
-    The format of *DATE* is the same as for ``--after`` above.
+    The format of *DATE* is the same as for ``--after``, above.
 
 --batch, --no-batch   Don’t print headers giving file names.
 
