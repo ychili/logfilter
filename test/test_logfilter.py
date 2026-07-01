@@ -12,8 +12,11 @@ import functools
 import os
 import os.path
 import shutil
+import signal
+import subprocess
 import tempfile
 import unittest
+import unittest.mock
 
 import logfilter
 
@@ -184,6 +187,16 @@ class TestAWK(unittest.TestCase):
     def test_availability(self) -> None:
         """Check if `awk` is installed on $PATH."""
         self.assertIsNotNone(shutil.which("awk"), "'awk' is not installed on $PATH")
+
+    @unittest.mock.patch("subprocess.run")
+    def test_broken_pipe(self, mock_run: unittest.mock.MagicMock) -> None:
+        mock_run.side_effect = subprocess.CalledProcessError(
+            -signal.SIGPIPE, ["mockawk"]
+        )
+        with self.assertRaises(SystemExit) as exc_info:
+            logfilter.awk([], "")
+        mock_run.assert_called_once()
+        self.assertEqual(exc_info.exception.code, 0)
 
 
 if __name__ == "__main__":

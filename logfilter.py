@@ -21,6 +21,7 @@ import logging
 import os
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import types
@@ -249,6 +250,11 @@ def awk(
     try:
         proc = subprocess.run(cmds, check=True)
     except subprocess.CalledProcessError as err:
+        if signal.Signals(-err.returncode) == signal.SIGPIPE:
+            # Broken pipe. It should be okay to exit normally, as long as
+            # there isn't still un-flushed data in stdout. That will cause
+            # Python to complain noisily when the interpreter exits.
+            sys.exit(0)
         die(str(err))
     return proc.returncode
 
