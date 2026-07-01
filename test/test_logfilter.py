@@ -98,11 +98,12 @@ class TestMatchSection(unittest.TestCase):
 
 
 class TestKVParse(unittest.TestCase):
-    basic = r"""
+    _BASIC = """
     # Each line in this string is indented, but that shouldn't matter.
     key1="${HOME}"/logs
 
-    """.splitlines(keepends=True)
+    """
+    basic = _BASIC.splitlines(keepends=True)
     trailing = ["key1=value    \n", "key2=value  # This comment is not discarded\n"]
     spacing = ["  NormalKey = No line breaks please\n", "  Key With Spaces = Value\n"]
     punctuation = ["EqualsSign = 2 + 2 = 4\n", "\n"]
