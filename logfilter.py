@@ -75,7 +75,7 @@ BOOLEAN_STATES: dict[str, bool] = {
 Arg = Union[str, bytes, os.PathLike[str], os.PathLike[bytes]]
 
 
-# pylint: disable=too-few-public-methods
+# pylint: disable-next=too-few-public-methods
 class Args(types.SimpleNamespace):
     """Namespace for parsed command-line arguments"""
 
@@ -215,7 +215,7 @@ def _set_awk_options(section: Mapping[str, str]) -> dict[str, str]:
     return {"program_text": section["program"]}
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable-next=too-many-arguments
 def awk(
     files: Iterable[Arg],
     program_text: Optional[Arg] = None,
