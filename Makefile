@@ -4,6 +4,7 @@ PYTHON ?= python3
 print_directive := printf '.. |%s| replace:: %s\n'
 
 includedir := doc/include
+datefile := $(includedir)/source_date
 metadatafile := $(includedir)/metadata.rst
 defaultsfile := $(includedir)/defaults.txt
 
@@ -21,9 +22,11 @@ $(metadatafile): doc/logfilter.1.rst logfilter.py | $(includedir)
 		$$($(PYTHON) \
 		-c 'import logfilter; print(logfilter.__version__)') \
 		>> $@
+	git log -1 --pretty=format:@%ct%n doc/logfilter.1.rst > $(datefile)
 	$(print_directive) date \
-		$$(git log -1 --pretty=format:%cs doc/logfilter.1.rst) \
+		$$(date --utc --file=$(datefile) +%Y-%m-%d) \
 		>> $@
+	rm $(datefile)
 
 $(defaultsfile): logfilter.py | $(includedir)
 	$(PYTHON) \
